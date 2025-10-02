@@ -1,5 +1,5 @@
 # Machine Learning Final Project [Module2]
-# Group 10 - Nishat Islam and Emmii Cui
+# Group 10 - Nishat and Emmii Cui
 # March/April, 2021
 # Data Training Module with functions to process data and predict output
 
@@ -8,74 +8,45 @@ import sklearn
 from sklearn.linear_model import LinearRegression
 
 
-# Function for processing data with continuous predictor columns
-def dataprocess(filename, input_start, input_end, output_col):
-    day_dict = {"mon": 1, "tue": 2, "wed": 3, "thu": 4, "fri": 5,
-                "sat": 6, "sun": 7}
-    month_dict = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5,
-                  "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10,
-                  "nov": 11, "dec": 12}
-    datafile = open(filename, encoding="latin1")
-    header = datafile.readline().split(",")
+# Function that processes the data
+def dataprocess(filename, input_cols, output_col, divider_character,
+                transform):
+    # Get header
+    header = filename.readline().split(divider_character)
+    predictors = (header[i] for i in input_cols)
     print('{:s}'.format('\u0332'.join("Predictors:")))
-    print(*header[input_start:input_end+1], sep=", ")
-    print('{:s}'.format('\u0332'.join("Output(s):")))
+    print(*predictors, sep=", ")
+    print('{:s}'.format('\u0332'.join("Output:")))
     print(header[output_col])
-    # Initialize input/output lists
+    # Initialize lists
     outputs = []
     inputs = []
-    for line in datafile:
-        data = line.strip().split(",")
-        # Get column of output
-        outputs.append(float(data[output_col]))
-        # Get columns of predictor information
+    for line in filename:
+        data = line.strip().split(divider_character)
+        # Get predictor information
         predict_info = []
-        for i in data[input_start:input_end+1]:
-            for k, v in day_dict.items():
-                if i == k:
-                    i = v
-            for key, value in month_dict.items():
-                if i == key:
-                    i = value
-            predict_info.append(float(i))
-        inputs.append(predict_info)
-    return outputs, inputs
-
-
-# Function definition includes a log transformation
-def log_dataprocess(filename, input_start, input_end, output_col):
-    day_dict = {"mon": 1, "tue": 2, "wed": 3, "thu": 4, "fri": 5,
-                "sat": 6, "sun": 7}
-    month_dict = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5,
-                  "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10,
-                  "nov": 11, "dec": 12}
-    datafile = open(filename, encoding="latin1")
-    header = datafile.readline().split(",")
-    print('{:s}'.format('\u0332'.join("Predictors (log transformed):")))
-    print(*header[input_start:input_end+1], sep=", ")
-    print('{:s}'.format('\u0332'.join("Output(s):")))
-    print(header[output_col])
-    # Initialize input/output lis
-    outputs = []
-    inputs = []
-    for line in datafile:
-        data = line.strip().split(",")
-        # Get column of output
-        outputs.append(float(data[output_col]))
-        # Get columns of predictor information
-        predict_info = []
-        for i in data[input_start:input_end+1]:
-            for k, v in day_dict.items():
-                if i == k:
-                    i = v
-            for key, value in month_dict.items():
-                if i == key:
-                    i = value
-            i = abs(float(i))
+        log_predict_info = []
+        predict_inner = [data[i] for i in input_cols]
+        for i in predict_inner:
+            if i != "":
+                predict_info.append(float(i))
+        for i in predict_info:
+            i = abs(i)
             if i > 0:
                 i = math.log(float(i))
-            predict_info.append(i)
-        inputs.append(predict_info)
+            log_predict_info.append(i)
+        if transform == "yes":
+            if len(log_predict_info) == len(input_cols):
+                # Populate list of output
+                outputs.append(float(data[output_col]))
+                # Populate list of inputs
+                inputs.append(log_predict_info)
+        else:
+            if len(predict_info) == len(input_cols):
+                # Populate list of output
+                outputs.append(float(data[output_col]))
+                # Populate list of inputs
+                inputs.append(predict_info)
     return outputs, inputs
 
 

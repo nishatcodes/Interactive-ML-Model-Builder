@@ -1,4 +1,4 @@
-# Machine Learning Final Project [Module]
+# Machine Learning Final Project [Module 1]
 # Group 10 - Nishat and Emmii Cui
 # March/April, 2021
 # Bar Graph Functions
@@ -122,7 +122,7 @@ def label(t, percentage):
     t.forward(10)
 
 
-# Title, x axis, and y axis labels
+# Title and x axis and y axis labels
 def title(t, title_name, y_values):
     max_ht = max(y_values)
     numbars = len(y_values)
@@ -134,6 +134,8 @@ def title(t, title_name, y_values):
     t.forward((20*numbars+border)/2)
     t.write(title_name, move=False, align="center",
             font=("Arial", 25, "bold", "underline"))
+    t.right(90)
+    t.forward(max_ht/15)
     t.goto(0, -10)
     t.color("slategray")
     t.write("x-axis: percentage error intervals (%)       "
